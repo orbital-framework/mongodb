@@ -166,7 +166,7 @@ class ActiveMango extends Mango {
 	 * @return object
 	 */
 	public function getCollection(){
-		return parent::getDb($this->collection);
+		return parent::getDb($this->_collection);
 	}
 
 	/**
