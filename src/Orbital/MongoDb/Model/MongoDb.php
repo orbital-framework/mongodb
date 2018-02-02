@@ -1,6 +1,12 @@
 <?php
 
-class Mango {
+namespace Orbital\MongoDb\Model;
+
+use MongoDB\Client;
+use Exception;
+use App;
+
+class MongoDb {
 
 	/**
 	 * Database connection
@@ -52,7 +58,7 @@ class Mango {
 				$this->setConnection($data['connection'], $data['database']);
 			}
 
-			$client = new MongoDB\Client(
+			$client = new Client(
 				$this->_databaseConnection
 			);
 
@@ -118,7 +124,7 @@ class Mango {
 
 		$limit = 1;
 		$documents = $this->findInCollection($collection, $query, $sort, $limit, $skip);
-		
+
 		if( $documents ){
 			foreach( $documents as $item ){
 				return $item;
