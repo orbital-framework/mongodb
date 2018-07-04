@@ -1,5 +1,15 @@
 {
+    "name": "orbital-framework/mongodb",
+    "description": "MongoDB Wrapper for Orbital Framework",
+    "keywords": ["orbital-framework","mongodb","database"],
+    "homepage": "https://github.com/orbital-framework/mongodb",
     "require": {
+        "php": ">=5.6",
         "mongodb/mongodb": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Orbital\\MongoDb\\": "src"
+        }
     }
 }
