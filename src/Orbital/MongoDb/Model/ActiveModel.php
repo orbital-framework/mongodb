@@ -2,7 +2,7 @@
 
 namespace Orbital\MongoDb\Model;
 
-use Orbital\MongoDb\Helper\Utils;
+use \Orbital\MongoDb\Helper\Utils;
 
 class ActiveModel extends MongoDb {
 
@@ -65,6 +65,7 @@ class ActiveModel extends MongoDb {
     /**
      * CONSTRUCTOR
      * @param mixed $filter
+     * @return void
      */
     public function __construct($filter = NULL, $sort = array(), $skip = NULL){
 
@@ -167,7 +168,7 @@ class ActiveModel extends MongoDb {
 
     /**
      * Retrieve database collection
-     * @return object
+     * @return \MongoDB\Collection
      */
     public function getCollection(){
         return parent::getDb($this->_collection);

@@ -2,9 +2,9 @@
 
 namespace Orbital\MongoDb\Model;
 
-use MongoDB\Client;
-use Exception;
-use App;
+use \MongoDB\Client;
+use \Exception;
+use \App;
 
 class MongoDb {
 
@@ -43,6 +43,7 @@ class MongoDb {
 
     /**
      * Connect with database
+     * @throws Exception
      * @return object
      */
     public function connect(){
@@ -73,7 +74,7 @@ class MongoDb {
     /**
      * Retrieve database object
      * @param string $collection
-     * @return object
+     * @return \MongoDB\Database
      */
     public function getDb($collection = NULL){
 

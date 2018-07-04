@@ -8,7 +8,7 @@ class Utils {
      * Generate short UUID, without dashes
      * @return string
      */
-    function generateShortUUID() {
+    function generateShortUUID(){
         $uuid = str_replace('-', '', $this->generateUUID());
         return $uuid;
     }
@@ -24,15 +24,15 @@ class Utils {
         $prBits = null;
         $fp = @fopen('/dev/urandom', 'rb');
 
-        if ($fp !== false) {
+        if( $fp !== false ){
             $prBits .= @fread($fp, 16);
             @fclose($fp);
 
-        } else {
+        }else{
 
             $prBits = "";
 
-            for($cnt=0; $cnt < 16; $cnt++){
+            for( $cnt = 0; $cnt < 16; $cnt++ ){
                 $prBits .= chr(mt_rand(0, 255));
             }
         }
@@ -59,7 +59,6 @@ class Utils {
             $clockSeqHiAndReserved,
             $node
         );
-
     }
 
 }

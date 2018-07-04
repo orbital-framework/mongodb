@@ -1,5 +1,7 @@
 <?php
 
+use \App;
+
 // Development
 if( ENVIRONMENT == 'development' ):
 
