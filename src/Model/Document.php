@@ -3,11 +3,12 @@
 namespace Orbital\MongoDb\Model;
 
 use \Orbital\MongoDb\Helper\Utils;
+use \Orbital\MongoDb\Model\Collection;
 
-class ActiveModel extends MongoDb {
+class Document extends Collection {
 
     /**
-     * Database collection
+     * Document collection
      * @access protected
      * @var string
      */
@@ -76,6 +77,8 @@ class ActiveModel extends MongoDb {
         if( !$this->_collection ){
             $this->_collection = strtolower( get_class($this) );
         }
+
+        $this->setDatabaseCollection($this->_collection);
 
         if( !is_null( $filter ) ){
             $this->findOne($filter, $sort, $skip);
@@ -167,14 +170,6 @@ class ActiveModel extends MongoDb {
     }
 
     /**
-     * Retrieve database collection
-     * @return \MongoDB\Collection
-     */
-    public function getCollection(){
-        return parent::getDb($this->_collection);
-    }
-
-    /**
      * Retrieve object data
      * @return array
      */
@@ -240,7 +235,11 @@ class ActiveModel extends MongoDb {
      * @param int $skip
      * @return mixed
      */
-    public function findOne($filter = array(), $sort = array(), $skip = NULL){
+    public function findOne(
+        $filter = array(),
+        $sort = array(),
+        $skip = NULL
+        ){
 
         if( !is_array($filter) ){
             $_filter = array();
@@ -248,8 +247,13 @@ class ActiveModel extends MongoDb {
             $filter = $_filter;
         }
 
+        $options = array();
+        $options['limit'] = 1;
+        if( $sort ){ $options['sort'] = $sort; }
+        if( $skip ){ $options['skip'] = $skip; }
+
         $this->reset();
-        $document = parent::findOneInCollection($this->_collection, $filter, $sort, $skip);
+        $document = parent::findOne($filter, $options);
 
         if( $document ){
             $this->_object = (array) $document;
@@ -267,10 +271,20 @@ class ActiveModel extends MongoDb {
      * @param int $skip
      * @return array
      */
-    public function find($filter = array(), $sort = array(), $limit = NULL, $skip = NULL){
+    public function find(
+        $filter = array(),
+        $sort = array(),
+        $limit = NULL,
+        $skip = NULL
+        ){
+
+        $options = array();
+        if( $sort ){ $options['sort'] = $sort; }
+        if( $limit ){ $options['limit'] = $limit; }
+        if( $skip ){ $options['skip'] = $skip; }
 
         $this->reset();
-        $results = parent::findInCollection($this->_collection, $filter, $sort, $limit, $skip);
+        $results = parent::find($filter, $options);
 
         if( $results ){
             $this->_loaded = TRUE;
@@ -285,32 +299,48 @@ class ActiveModel extends MongoDb {
     /**
      * Count object from collection
      * @param array $filter
+     * @param array $sort
+     * @param int $limit
+     * @param int $skip
      * @return int
      */
-    public function count($filter = array()){
+    public function count(
+        $filter = array(),
+        $sort = array(),
+        $limit = NULL,
+        $skip = NULL
+        ){
+
+        $options = array();
+        if( $sort ){ $options['sort'] = $sort; }
+        if( $limit ){ $options['limit'] = $limit; }
+        if( $skip ){ $options['skip'] = $skip; }
+
         $this->reset();
-        return parent::countInCollection($this->_collection, $filter);
+        return parent::count($filter, $options);
     }
 
     /**
      * Retrieve aggregate data from collection
-     * @param array $query
-     * @return int
+     * @param array $pipeline
+     * @param array $options
+     * @return object
      */
-    public function aggregate($query = array()){
+    public function aggregate($pipeline, $options = array()){
         $this->reset();
-        return parent::aggregateInCollection($this->_collection, $query);
+        return parent::aggregate($pipeline, $options);
     }
 
     /**
      * Retrieve distinct field data from collection
      * @param string $field
      * @param array $filter
-     * @return int
+     * @param array $options
+     * @return object
      */
-    public function distinct($field, $filter = array()){
+    public function distinct($field, $filter, $options = array()){
         $this->reset();
-        return parent::distinctInCollection($this->_collection, $field, $filter);
+        return parent::distinct($field, $filter, $options);
     }
 
     /**
@@ -330,10 +360,13 @@ class ActiveModel extends MongoDb {
 
             $helper = new Utils;
             $primaryKey = $helper->generateShortUUID();
-
             $this->{$this->_primaryKey} = $primaryKey;
-            $result = parent::insertInCollection(
-                $this->_collection, $this->_object
+
+            $options = array();
+
+            $result = parent::insertOne(
+                $this->_object,
+                $options
             );
 
         // Update
@@ -341,8 +374,12 @@ class ActiveModel extends MongoDb {
 
             $filter = array();
             $filter[ $this->_primaryKey ] = $this->__toString();
-            $result = parent::replaceInCollection(
-                $this->_collection, $filter, $this->_object
+            $options = array();
+
+            $result = parent::replaceOne(
+                $filter,
+                $this->_object,
+                $options
             );
 
         }
@@ -361,9 +398,11 @@ class ActiveModel extends MongoDb {
 
         $filter = array();
         $filter[ $this->_primaryKey ] = $this->__toString();
-        $this->reset();
 
-        return parent::deleteInCollection($this->_collection, $filter);
+        $options = array();
+
+        $this->reset();
+        return parent::deleteOne($filter, $options);
     }
 
     /**
