@@ -2,9 +2,9 @@
 
 namespace Orbital\MongoDb\Model;
 
+use \Orbital\Framework\App;
 use \Orbital\MongoDb\Model\Client;
 use \Exception;
-use \App;
 
 class Database extends Client {
 

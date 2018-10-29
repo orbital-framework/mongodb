@@ -1,6 +1,9 @@
-<?php
+# Orbital MongoDB
 
-use \App;
+Sample config for MongoDB usage:
+
+```php
+use \Orbital\Framework\App;
 
 // Development
 if( ENVIRONMENT == 'development' ):
@@ -48,3 +51,4 @@ else:
     ));
 
 endif;
+```
