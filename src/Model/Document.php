@@ -4,6 +4,7 @@ namespace Orbital\MongoDb\Model;
 
 use \Orbital\MongoDb\Helper\Utils;
 use \Orbital\MongoDb\Model\Collection;
+use \Orbital\Framework\Object;
 
 class Document extends Collection {
 
@@ -22,6 +23,13 @@ class Document extends Collection {
     protected $_unique = FALSE;
 
     /**
+     * Register object loaded status
+     * @access protected
+     * @var boolean
+     */
+    protected $_loaded = FALSE;
+
+    /**
      * Primary key for object
      * @access protected
      * @var string
@@ -31,37 +39,9 @@ class Document extends Collection {
     /**
      * Object data
      * @access protected
-     * @var array
+     * @var Object
      */
-    protected $_object = array();
-
-    /**
-     * Object original data
-     * @access protected
-     * @var array
-     */
-    protected $_objectOriginal = array();
-
-    /**
-     * Object data changes
-     * @access protected
-     * @var array
-     */
-    protected $_objectChanges = array();
-
-    /**
-     * Register object loaded status
-     * @access protected
-     * @var boolean
-     */
-    protected $_loaded = FALSE;
-
-    /**
-     * Register object saved status
-     * @access protected
-     * @var boolean
-     */
-    protected $_saved = FALSE;
+    protected $_object;
 
     /**
      * CONSTRUCTOR
@@ -78,6 +58,7 @@ class Document extends Collection {
             $this->_collection = strtolower( get_class($this) );
         }
 
+        $this->_object = new Object;
         $this->setDatabaseCollection($this->_collection);
 
         if( !is_null( $filter ) ){
@@ -87,16 +68,29 @@ class Document extends Collection {
     }
 
     /**
+     * Retrieve object data
+     * @return object
+     */
+    public function getObject(){
+        return $this->_object;
+    }
+
+    /**
+     * Magic method __toString
+     * Returns primary key value
+     * @return string
+     */
+    public function __toString(){
+        return (string) $this->getObject()->getData($this->_primaryKey);
+    }
+
+    /**
      * Magic method __get
      * @param string $item
      * @return mixed
      */
     public function __get($item){
-
-        if( array_key_exists($item, $this->_object) ){
-            return $this->_object[$item];
-        }
-
+        return $this->getObject()->getData($item);
     }
 
     /**
@@ -106,23 +100,7 @@ class Document extends Collection {
      * @return void
      */
     public function __set($item, $value){
-
-        if( isset($this->_object[$item]) ){
-
-            if( $this->_object[$item] != $value ){
-
-                $this->_objectOriginal[$item] = $this->_object[$item];
-                $this->_objectChanges[$item] = $value;
-
-            }
-
-        }else{
-            $this->_objectChanges[$item] = $value;
-        }
-
-        $this->_object[$item] = $value;
-        $this->_saved = FALSE;
-
+        return $this->getObject()->setData($item, $value);
     }
 
     /**
@@ -131,7 +109,7 @@ class Document extends Collection {
      * @return boolean
      */
     public function __isset($item){
-        return isset($this->_object[$item]);
+        return $this->getObject()->hasData($item);
     }
 
     /**
@@ -140,25 +118,7 @@ class Document extends Collection {
      * @return void
      */
     public function __unset($item){
-
-        if( isset($this->_object[$item]) ){
-
-            $this->_objectOriginal[$item] = $this->_object[$item];
-            $this->_objectChanges[$item] = NULL;
-
-            unset($this->_object[$item]);
-
-        }
-
-    }
-
-    /**
-     * Magic method __toString
-     * Returns primary key value
-     * @return string
-     */
-    public function __toString(){
-        return ($this->{$this->_primaryKey}) ? (string) $this->{$this->_primaryKey} : '0';
+        return $this->getObject()->unsData($item);
     }
 
     /**
@@ -170,57 +130,18 @@ class Document extends Collection {
     }
 
     /**
-     * Retrieve object data
-     * @return array
-     */
-    public function getObjectData(){
-        return $this->_object;
-    }
-
-    /**
-     * Retrieve object original data
-     * @param boolean $clean
-     * @return array
-     */
-    public function getObjectOriginal($clean = FALSE){
-
-        $object = $this->_objectOriginal;
-
-        if( $clean ){
-            unset($object[ $this->_primaryKey ]);
-        }
-
-        return $object;
-    }
-
-    /**
-     * Retrieve object data changes
-     * @param boolean $clean
-     * @return array
-     */
-    public function getObjectChanges($clean = FALSE){
-
-        $object = $this->_objectChanges;
-
-        if( $clean ){
-            unset($object[ $this->_primaryKey ]);
-        }
-
-        return $object;
-    }
-
-    /**
      * Convert array data to unique object collection class
      * @param array $data
      * @return object
      */
     public function toUnique($data){
 
-        if( $this->_unique AND class_exists($this->_unique) ){
+        if( $this->_unique
+            AND class_exists($this->_unique) ){
 
             $document = new $this->_unique;
-            $document->_object = (array) $data;
             $document->_loaded = TRUE;
+            $document->getObject()->addData( (array) $data );
 
             return $document;
         }
@@ -256,8 +177,8 @@ class Document extends Collection {
         $document = parent::findOne($filter, $options);
 
         if( $document ){
-            $this->_object = (array) $document;
             $this->_loaded = TRUE;
+            $this->getObject()->addData( (array) $document );
         }
 
         return $this;
@@ -284,16 +205,7 @@ class Document extends Collection {
         if( $skip ){ $options['skip'] = $skip; }
 
         $this->reset();
-        $results = parent::find($filter, $options);
-
-        if( $results ){
-            $this->_loaded = TRUE;
-            $this->_object = $results;
-        }else{
-            $this->_object = array();
-        }
-
-        return $this->_object;
+        return parent::find($filter, $options);
     }
 
     /**
@@ -349,23 +261,25 @@ class Document extends Collection {
      */
     public function save(){
 
-        if( !$this->getObjectChanges() ){
-            $this->_saved = TRUE;
+        if( !$this->getObject()->getChanges() ){
             return TRUE;
         }
 
         // Insert
-        if( !$this->{$this->_primaryKey}
+        if( !$this->__toString()
             OR !$this->_loaded ){
 
             $helper = new Utils;
             $primaryKey = $helper->generateShortUUID();
-            $this->{$this->_primaryKey} = $primaryKey;
+
+            $this->getObject()->setData(
+                $this->_primaryKey, $primaryKey
+            );
 
             $options = array();
 
             $result = parent::insertOne(
-                $this->_object,
+                $this->getObject()->toArray(),
                 $options
             );
 
@@ -378,13 +292,12 @@ class Document extends Collection {
 
             $result = parent::replaceOne(
                 $filter,
-                $this->_object,
+                $this->getObject()->toArray(),
                 $options
             );
 
         }
 
-        $this->_saved = TRUE;
         // $this->reload();
 
         return $result;
@@ -410,7 +323,7 @@ class Document extends Collection {
      * @return object
      */
     public function reload(){
-        $this->findOne("{$this}");
+        $this->findOne( $this->__toString() );
         return $this;
     }
 
@@ -420,11 +333,8 @@ class Document extends Collection {
      */
     public function reset(){
 
-        $this->_object = array();
-        $this->_objectOriginal = array();
-        $this->_objectChanges = array();
+        $this->getObject()->cleanData();
         $this->_loaded = FALSE;
-        $this->_saved = FALSE;
 
         return $this;
     }
