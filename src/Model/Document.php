@@ -41,7 +41,7 @@ class Document extends Collection {
      * @access protected
      * @var Object
      */
-    protected $_object;
+    protected $_object = NULL;
 
     /**
      * CONSTRUCTOR
@@ -58,7 +58,6 @@ class Document extends Collection {
             $this->_collection = strtolower( get_class($this) );
         }
 
-        $this->_object = new Object;
         $this->setDatabaseCollection($this->_collection);
 
         if( !is_null( $filter ) ){
@@ -72,6 +71,11 @@ class Document extends Collection {
      * @return object
      */
     public function getObject(){
+
+        if( $this->_object === NULL ){
+            $this->_object = new Object;
+        }
+
         return $this->_object;
     }
 
