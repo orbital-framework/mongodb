@@ -81,7 +81,7 @@ class Document extends Collection {
      * @return string
      */
     public function __toString(){
-        return (string) $this->getObject()->getData($this->_primaryKey);
+        return (string) $this->getData($this->_primaryKey);
     }
 
     /**
@@ -90,7 +90,7 @@ class Document extends Collection {
      * @return mixed
      */
     public function __get($item){
-        return $this->getObject()->getData($item);
+        return $this->getData($item);
     }
 
     /**
@@ -100,7 +100,7 @@ class Document extends Collection {
      * @return void
      */
     public function __set($item, $value){
-        return $this->getObject()->setData($item, $value);
+        return $this->setData($item, $value);
     }
 
     /**
@@ -109,7 +109,7 @@ class Document extends Collection {
      * @return boolean
      */
     public function __isset($item){
-        return $this->getObject()->hasData($item);
+        return $this->hasData($item);
     }
 
     /**
@@ -118,7 +118,18 @@ class Document extends Collection {
      * @return void
      */
     public function __unset($item){
-        return $this->getObject()->unsData($item);
+        return $this->unsData($item);
+    }
+
+    /**
+     * Magic method __call
+     * @param string $name
+     * @param mixed $arguments
+     * @return void
+     */
+    public function __call($name, $arguments){
+        $callable = array($this->getObject(), $name);
+        return \call_user_func_array($callable, $arguments);
     }
 
     /**
@@ -141,7 +152,7 @@ class Document extends Collection {
 
             $document = new $this->_unique;
             $document->_loaded = TRUE;
-            $document->getObject()->addData( (array) $data );
+            $document->addData( (array) $data );
 
             return $document;
         }
@@ -178,7 +189,7 @@ class Document extends Collection {
 
         if( $document ){
             $this->_loaded = TRUE;
-            $this->getObject()->addData( (array) $document );
+            $this->addData( (array) $document );
         }
 
         return $this;
@@ -261,7 +272,7 @@ class Document extends Collection {
      */
     public function save(){
 
-        if( !$this->getObject()->getChanges() ){
+        if( !$this->getChanges() ){
             return TRUE;
         }
 
@@ -272,14 +283,14 @@ class Document extends Collection {
             $helper = new Utils;
             $primaryKey = $helper->generateShortUUID();
 
-            $this->getObject()->setData(
+            $this->setData(
                 $this->_primaryKey, $primaryKey
             );
 
             $options = array();
 
             $result = parent::insertOne(
-                $this->getObject()->toArray(),
+                $this->toArray(),
                 $options
             );
 
@@ -292,7 +303,7 @@ class Document extends Collection {
 
             $result = parent::replaceOne(
                 $filter,
-                $this->getObject()->toArray(),
+                $this->toArray(),
                 $options
             );
 
@@ -333,7 +344,7 @@ class Document extends Collection {
      */
     public function reset(){
 
-        $this->getObject()->cleanData();
+        $this->cleanData();
         $this->_loaded = FALSE;
 
         return $this;
