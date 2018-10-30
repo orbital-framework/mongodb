@@ -157,6 +157,7 @@ class Document extends Collection {
             $document = new $this->_unique;
             $document->_loaded = TRUE;
             $document->addData( (array) $data );
+            $document->cleanChanges();
 
             return $document;
         }
@@ -194,6 +195,7 @@ class Document extends Collection {
         if( $document ){
             $this->_loaded = TRUE;
             $this->addData( (array) $document );
+            $this->cleanChanges();
         }
 
         return $this;
