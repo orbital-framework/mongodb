@@ -315,6 +315,7 @@ class Document extends Collection {
 
         }
 
+        $this->_loaded = TRUE;
         // $this->reload();
 
         return $result;
