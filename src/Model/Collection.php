@@ -150,7 +150,7 @@ class Collection extends Database {
      * @param array $options
      * @return object
      */
-    public function deleteOne($filter, $options){
+    public function deleteOne($filter, $options = array()){
         return $this->getDatabaseCollection()->deleteOne(
             $filter, $options
         );
