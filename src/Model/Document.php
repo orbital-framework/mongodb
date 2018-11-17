@@ -46,9 +46,10 @@ class Document extends Collection {
     /**
      * CONSTRUCTOR
      * @param mixed $filter
+     * @param mixed $options
      * @return void
      */
-    public function __construct($filter = NULL, $sort = array(), $skip = NULL){
+    public function __construct($filter = NULL, $options = array()){
 
         if( !$this->_unique ){
             $this->_unique = get_class($this);
@@ -60,8 +61,8 @@ class Document extends Collection {
 
         $this->setDatabaseCollection($this->_collection);
 
-        if( !is_null( $filter ) ){
-            $this->findOne($filter, $sort, $skip);
+        if( !is_null($filter) ){
+            $this->findOne($filter, $options);
         }
 
     }
@@ -168,15 +169,10 @@ class Document extends Collection {
     /**
      * Retrieve the first result of a query
      * @param array $filter
-     * @param array $sort
-     * @param int $skip
+     * @param array $options
      * @return mixed
      */
-    public function findOne(
-        $filter = array(),
-        $sort = array(),
-        $skip = NULL
-        ){
+    public function findOne($filter = array(), $options = array()){
 
         if( !is_array($filter) ){
             $_filter = array();
@@ -184,10 +180,7 @@ class Document extends Collection {
             $filter = $_filter;
         }
 
-        $options = array();
         $options['limit'] = 1;
-        if( $sort ){ $options['sort'] = $sort; }
-        if( $skip ){ $options['skip'] = $skip; }
 
         $this->reset();
         $document = parent::findOne($filter, $options);
@@ -204,23 +197,10 @@ class Document extends Collection {
     /**
      * Execute query and retrieve cursor results
      * @param array $filter
-     * @param array $sort
-     * @param int $limit
-     * @param int $skip
+     * @param array $options
      * @return array
      */
-    public function find(
-        $filter = array(),
-        $sort = array(),
-        $limit = NULL,
-        $skip = NULL
-        ){
-
-        $options = array();
-        if( $sort ){ $options['sort'] = $sort; }
-        if( $limit ){ $options['limit'] = $limit; }
-        if( $skip ){ $options['skip'] = $skip; }
-
+    public function find($filter = array(), $options = array()){
         $this->reset();
         return parent::find($filter, $options);
     }
@@ -228,23 +208,10 @@ class Document extends Collection {
     /**
      * Count object from collection
      * @param array $filter
-     * @param array $sort
-     * @param int $limit
-     * @param int $skip
+     * @param array $options
      * @return int
      */
-    public function count(
-        $filter = array(),
-        $sort = array(),
-        $limit = NULL,
-        $skip = NULL
-        ){
-
-        $options = array();
-        if( $sort ){ $options['sort'] = $sort; }
-        if( $limit ){ $options['limit'] = $limit; }
-        if( $skip ){ $options['skip'] = $skip; }
-
+    public function count($filter = array(), $options = array()){
         $this->reset();
         return parent::count($filter, $options);
     }
