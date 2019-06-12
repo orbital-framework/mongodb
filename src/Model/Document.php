@@ -4,7 +4,7 @@ namespace Orbital\MongoDb\Model;
 
 use \Orbital\MongoDb\Helper\Utils;
 use \Orbital\MongoDb\Model\Collection;
-use \Orbital\Framework\AppObject;
+use \Orbital\Framework\Entity;
 
 class Document extends Collection {
 
@@ -39,7 +39,7 @@ class Document extends Collection {
     /**
      * Object data
      * @access protected
-     * @var AppObject
+     * @var Entity
      */
     protected $_object = NULL;
 
@@ -69,12 +69,12 @@ class Document extends Collection {
 
     /**
      * Retrieve object data
-     * @return AppObject
+     * @return Entity
      */
     public function getObject(){
 
         if( $this->_object === NULL ){
-            $this->_object = new AppObject;
+            $this->_object = new Entity;
         }
 
         return $this->_object;
