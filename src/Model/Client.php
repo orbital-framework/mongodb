@@ -3,6 +3,7 @@
 namespace Orbital\MongoDb\Model;
 
 use \Orbital\Framework\App;
+use \Orbital\I18n\Translator;
 use \MongoDB\Client as MongoClient;
 use \Exception;
 
@@ -93,7 +94,7 @@ class Client {
             );
 
         }catch( Exception $e ){
-            die(__('Error connecting to database: '). $e->getMessage());
+            die(Translator::__('Error connecting to database: '). $e->getMessage());
         }
 
     }
