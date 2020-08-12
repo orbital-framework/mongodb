@@ -1,11 +1,9 @@
 <?php
 
-namespace Orbital\MongoDb\Model;
+namespace Orbital\MongoDb;
 
-use \Orbital\Framework\App;
-use \Orbital\I18n\Translator;
-use \MongoDB\Client as MongoClient;
 use \Exception;
+use \Orbital\Framework\App;
 
 class Client {
 
@@ -87,14 +85,14 @@ class Client {
 
             }
 
-            $this->_client = new MongoClient(
+            $this->_client = new \MongoDB\Client(
                 $this->_uri,
                 $this->_uriOptions,
                 $this->_driverOptions
             );
 
         }catch( Exception $e ){
-            die(Translator::__('Error connecting to database: '). $e->getMessage());
+            die('Error connecting to database: '. $e->getMessage());
         }
 
     }

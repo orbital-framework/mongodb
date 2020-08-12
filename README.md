@@ -4,16 +4,16 @@ Sample config for MongoDB usage:
 
 ```php
 use \Orbital\Framework\App;
-use \Orbital\Framework\Request;
+use \Orbital\Env\Env;
 
 App::set('mongodb', array(
     'client' => array(
-        'uri' => Request::env('MONGODB_URI', 'mongodb://localhost:27017'),
+        'uri' => Env::get('MONGODB_URI'),
         'options' => array(),
         'driver' => array()
     ),
     'database' => array(
-        'name' => Request::env('MONGODB_DATABASE', 'orbital'),
+        'name' => Env::get('MONGODB_DATABASE'),
         'options' => array()
     )
 ));

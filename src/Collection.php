@@ -1,8 +1,6 @@
 <?php
 
-namespace Orbital\MongoDb\Model;
-
-use \Orbital\MongoDb\Model\Database;
+namespace Orbital\MongoDb;
 
 class Collection extends Database {
 

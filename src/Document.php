@@ -1,10 +1,9 @@
 <?php
 
-namespace Orbital\MongoDb\Model;
+namespace Orbital\MongoDb;
 
-use \Orbital\MongoDb\Helper\Utils;
-use \Orbital\MongoDb\Model\Collection;
 use \Orbital\Framework\Entity;
+use \Orbital\Generator\Uuid;
 
 class Document extends Collection {
 
@@ -211,7 +210,7 @@ class Document extends Collection {
      * @param array $options
      * @return int
      */
-    public function count($filter = array(), $options = array()){
+    public function count($filter, $options = array()){
         $this->reset();
         return parent::count($filter, $options);
     }
@@ -253,8 +252,7 @@ class Document extends Collection {
         if( !$this->__toString()
             OR !$this->_loaded ){
 
-            $helper = new Utils;
-            $primaryKey = $helper->generateShortUUID();
+            $primaryKey = Uuid::generateShort();
 
             $this->setData(
                 $this->_primaryKey, $primaryKey
