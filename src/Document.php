@@ -5,6 +5,7 @@ namespace Orbital\MongoDb;
 
 use \Orbital\Framework\Entity;
 use \Orbital\Generator\Uuid;
+use \Orbital\MongoDb\Collection;
 
 class Document extends Collection {
 

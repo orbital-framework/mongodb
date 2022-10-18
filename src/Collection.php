@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Orbital\MongoDb;
 
+use \Orbital\MongoDb\Database;
+
 class Collection extends Database {
 
     /**
