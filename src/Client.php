@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Orbital\MongoDb;
 
@@ -27,7 +28,7 @@ class Client {
 
     /**
      * Client resource
-     * @var object
+     * @var \MongoDB\Client
      */
     private $_client;
 
@@ -40,16 +41,15 @@ class Client {
      * @return void
      */
     public function setConnection(
-        $uri,
-        $uriOptions = array(),
-        $driverOptions = array()
-        ){
+        string $uri,
+        array $uriOptions = array(),
+        array $driverOptions = array()
+    ): void {
 
         $this->_uri = $uri;
         $this->_uriOptions = $uriOptions;
         $this->_driverOptions = $driverOptions;
-
-        $this->_client = NULL;
+        $this->_client = null;
 
     }
 
@@ -58,10 +58,10 @@ class Client {
      * @throws Exception
      * @return void
      */
-    public function connectClient(){
+    public function connectClient(): void {
 
         if( $this->_client ){
-            return FALSE;
+            return;
         }
 
         try{
@@ -101,7 +101,7 @@ class Client {
      * Retrieve client
      * @return \MongoDB\Client
      */
-    public function getClient(){
+    public function getClient(): \MongoDB\Client {
         $this->connectClient();
         return $this->_client;
     }

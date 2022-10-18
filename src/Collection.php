@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Orbital\MongoDb;
 
@@ -6,7 +7,7 @@ class Collection extends Database {
 
     /**
      * Database collection
-     * @var resource
+     * @var \MongoDB\Collection
      */
     private $_databaseCollection;
 
@@ -16,7 +17,7 @@ class Collection extends Database {
      * @param array $options
      * @return \MongoDB\Collection
      */
-    public function getCollection($name, $options = array()){
+    public function getCollection(string $name, array $options = array()): \MongoDB\Collection {
         return $this->getDatabase()->selectCollection(
             $name, $options
         );
@@ -28,7 +29,7 @@ class Collection extends Database {
      * @param array $options
      * @return void
      */
-    public function setDatabaseCollection($name, $options = array()){
+    public function setDatabaseCollection(string $name, array $options = array()): void {
         $this->_databaseCollection = $this->getCollection(
             $name, $options
         );
@@ -38,7 +39,7 @@ class Collection extends Database {
      * Retrieve collection
      * @return \MongoDB\Collection
      */
-    public function getDatabaseCollection(){
+    public function getDatabaseCollection(): \MongoDB\Collection {
         return $this->_databaseCollection;
     }
 
@@ -46,9 +47,9 @@ class Collection extends Database {
      * Retrieve results from collection
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return \MongoDB\Driver\Cursor
      */
-    public function find($filter = array(), $options = array()){
+    public function find(array $filter = array(), array $options = array()): \MongoDB\Driver\Cursor {
 
         $documents = $this->getDatabaseCollection()->find(
             $filter, $options
@@ -61,9 +62,9 @@ class Collection extends Database {
      * Retrieve the first result from collection
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return \MongoDB\Model\BSONDocument
      */
-    public function findOne($filter = array(), $options = array()){
+    public function findOne(array $filter = array(), array $options = array()): \MongoDB\Model\BSONDocument {
 
         $options['limit'] = 1;
 
@@ -77,16 +78,16 @@ class Collection extends Database {
             }
         }
 
-        return array();
+        return new \MongoDB\Model\BSONDocument();
     }
 
     /**
      * Insert document on collection
      * @param array $document
      * @param array $options
-     * @return object
+     * @return \MongoDB\InsertOneResult
      */
-    public function insertOne($document, $options = array()){
+    public function insertOne(array $document, array $options = array()): \MongoDB\InsertOneResult {
         return $this->getDatabaseCollection()->insertOne(
             $document, $options
         );
@@ -97,9 +98,9 @@ class Collection extends Database {
      * @param array $filter
      * @param array $document
      * @param array $options
-     * @return object
+     * @return \MongoDB\UpdateResult
      */
-    public function replaceOne($filter, $document, $options = array()){
+    public function replaceOne(array $filter, array $document, array $options = array()): \MongoDB\UpdateResult {
         return $this->getDatabaseCollection()->replaceOne(
             $filter, $document, $options
         );
@@ -109,9 +110,9 @@ class Collection extends Database {
      * Count data in collection
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return int
      */
-    public function count($filter, $options = array()){
+    public function count(array $filter, array $options = array()): int {
         return $this->getDatabaseCollection()->count(
             $filter, $options
         );
@@ -121,9 +122,9 @@ class Collection extends Database {
      * Aggregate data on collection
      * @param array $pipeline
      * @param array $options
-     * @return object
+     * @return \Traversable
      */
-    public function aggregate($pipeline, $options = array()){
+    public function aggregate(array $pipeline, array $options = array()): \Traversable {
         return $this->getDatabaseCollection()->aggregate(
             $pipeline, $options
         );
@@ -134,9 +135,9 @@ class Collection extends Database {
      * @param string $field
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return array
      */
-    public function distinct($field, $filter, $options = array()){
+    public function distinct(string $field, array $filter, array $options = array()): array {
         return $this->getDatabaseCollection()->distinct(
             $field, $filter, $options
         );
@@ -146,9 +147,9 @@ class Collection extends Database {
      * Remove document on collection
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return \MongoDB\DeleteResult
      */
-    public function deleteOne($filter, $options = array()){
+    public function deleteOne(array $filter, array $options = array()): \MongoDB\DeleteResult {
         return $this->getDatabaseCollection()->deleteOne(
             $filter, $options
         );

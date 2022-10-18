@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Orbital\MongoDb;
 
@@ -21,7 +22,7 @@ class Database extends Client {
 
     /**
      * Database resource
-     * @var resource
+     * @var \MongoDB\Database
      */
     private $_database;
 
@@ -33,12 +34,11 @@ class Database extends Client {
      * @param array $driverOptions
      * @return void
      */
-    public function setDatabase($name, $options){
+    public function setDatabase(string $name, string $options): void {
 
         $this->_databaseName = $name;
         $this->_databaseOptions = $options;
-
-        $this->_database = NULL;
+        $this->_database = null;
 
     }
 
@@ -47,19 +47,19 @@ class Database extends Client {
      * @throws Exception
      * @return void
      */
-    public function connectDatabase(){
+    public function connectDatabase(): void {
 
         $this->connectClient();
 
         if( $this->_database ){
-            return FALSE;
+            return;
         }
 
         try{
 
             if( !$this->_databaseName ){
 
-                $data = App::get('mongodb');
+                $data = (array) App::get('mongodb');
                 $data = $data['database'];
 
                 $this->setDatabase(
@@ -84,7 +84,7 @@ class Database extends Client {
      * Retrieve database
      * @return \MongoDB\Database
      */
-    public function getDatabase(){
+    public function getDatabase(): \MongoDB\Database {
         $this->connectDatabase();
         return $this->_database;
     }

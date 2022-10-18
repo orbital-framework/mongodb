@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Orbital\MongoDb;
 
@@ -19,14 +20,14 @@ class Document extends Collection {
      * @access protected
      * @var string
      */
-    protected $_unique = FALSE;
+    protected $_unique = null;
 
     /**
      * Register object loaded status
      * @access protected
      * @var boolean
      */
-    protected $_loaded = FALSE;
+    protected $_loaded = false;
 
     /**
      * Primary key for object
@@ -40,15 +41,15 @@ class Document extends Collection {
      * @access protected
      * @var Entity
      */
-    protected $_object = NULL;
+    protected $_object = null;
 
     /**
      * CONSTRUCTOR
-     * @param mixed $filter
-     * @param mixed $options
+     * @param array $filter
+     * @param array $options
      * @return void
      */
-    public function __construct($filter = NULL, $options = array()){
+    public function __construct(array $filter = null, array $options = array()): void {
 
         if( !$this->_unique ){
             $this->_unique = get_class($this);
@@ -70,9 +71,9 @@ class Document extends Collection {
      * Retrieve object data
      * @return Entity
      */
-    public function getObject(){
+    public function getObject(): Entity {
 
-        if( $this->_object === NULL ){
+        if( is_null($this->_object) ){
             $this->_object = new Entity;
         }
 
@@ -84,7 +85,7 @@ class Document extends Collection {
      * Returns primary key value
      * @return string
      */
-    public function __toString(){
+    public function __toString(): string {
         return (string) $this->getData($this->_primaryKey);
     }
 
@@ -93,7 +94,7 @@ class Document extends Collection {
      * @param string $item
      * @return mixed
      */
-    public function __get($item){
+    public function __get(string $item): mixed {
         return $this->getData($item);
     }
 
@@ -103,7 +104,7 @@ class Document extends Collection {
      * @param mixed $value
      * @return void
      */
-    public function __set($item, $value){
+    public function __set(string $item, mixed $value): void {
         return $this->setData($item, $value);
     }
 
@@ -112,7 +113,7 @@ class Document extends Collection {
      * @param string $item
      * @return boolean
      */
-    public function __isset($item){
+    public function __isset(string $item): bool {
         return $this->hasData($item);
     }
 
@@ -121,7 +122,7 @@ class Document extends Collection {
      * @param string $item
      * @return void
      */
-    public function __unset($item){
+    public function __unset(string $item): void {
         return $this->unsData($item);
     }
 
@@ -131,7 +132,7 @@ class Document extends Collection {
      * @param mixed $arguments
      * @return void
      */
-    public function __call($name, $arguments){
+    public function __call(string $name, mixed $arguments): void {
         $callable = array($this->getObject(), $name);
         return \call_user_func_array($callable, $arguments);
     }
@@ -140,8 +141,8 @@ class Document extends Collection {
      * Return if object exists
      * @return boolean
      */
-    public function exists(){
-        return ( (boolean) $this->__toString() ) ? TRUE : FALSE;
+    public function exists(): bool {
+        return ( (boolean) $this->__toString() ) ? true : false;
     }
 
     /**
@@ -149,13 +150,13 @@ class Document extends Collection {
      * @param array $data
      * @return object
      */
-    public function toUnique($data){
+    public function toUnique(array $data): object {
 
         if( $this->_unique
             AND class_exists($this->_unique) ){
 
             $document = new $this->_unique;
-            $document->_loaded = TRUE;
+            $document->_loaded = true;
             $document->addData( (array) $data );
             $document->cleanChanges();
 
@@ -167,11 +168,11 @@ class Document extends Collection {
 
     /**
      * Retrieve the first result of a query
-     * @param array $filter
+     * @param string|array $filter
      * @param array $options
-     * @return mixed
+     * @return \MongoDB\Model\BSONDocument
      */
-    public function findOne($filter = array(), $options = array()){
+    public function findOne(string|array $filter = array(), array $options = array()): \MongoDB\Model\BSONDocument {
 
         if( !is_array($filter) ){
             $_filter = array();
@@ -185,21 +186,21 @@ class Document extends Collection {
         $document = parent::findOne($filter, $options);
 
         if( $document ){
-            $this->_loaded = TRUE;
+            $this->_loaded = true;
             $this->addData( (array) $document );
             $this->cleanChanges();
         }
 
-        return $this;
+        return $document;
     }
 
     /**
      * Execute query and retrieve cursor results
      * @param array $filter
      * @param array $options
-     * @return array
+     * @return \MongoDB\Driver\Cursor
      */
-    public function find($filter = array(), $options = array()){
+    public function find(array $filter = array(), array $options = array()): \MongoDB\Driver\Cursor {
         $this->reset();
         return parent::find($filter, $options);
     }
@@ -210,7 +211,7 @@ class Document extends Collection {
      * @param array $options
      * @return int
      */
-    public function count($filter, $options = array()){
+    public function count(array $filter, array $options = array()): int {
         $this->reset();
         return parent::count($filter, $options);
     }
@@ -219,9 +220,9 @@ class Document extends Collection {
      * Retrieve aggregate data from collection
      * @param array $pipeline
      * @param array $options
-     * @return object
+     * @return \Traversable
      */
-    public function aggregate($pipeline, $options = array()){
+    public function aggregate(array $pipeline, array $options = array()): \Traversable {
         $this->reset();
         return parent::aggregate($pipeline, $options);
     }
@@ -231,9 +232,9 @@ class Document extends Collection {
      * @param string $field
      * @param array $filter
      * @param array $options
-     * @return object
+     * @return array
      */
-    public function distinct($field, $filter, $options = array()){
+    public function distinct(string $field, array $filter, array $options = array()): array {
         $this->reset();
         return parent::distinct($field, $filter, $options);
     }
@@ -242,10 +243,10 @@ class Document extends Collection {
      * Insert or update object on collection
      * @return mixed
      */
-    public function save(){
+    public function save(): mixed {
 
         if( !$this->getChanges() ){
-            return TRUE;
+            return true;
         }
 
         // Insert
@@ -280,7 +281,7 @@ class Document extends Collection {
 
         }
 
-        $this->_loaded = TRUE;
+        $this->_loaded = true;
         // $this->reload();
 
         return $result;
@@ -288,9 +289,9 @@ class Document extends Collection {
 
     /**
      * Remove object from collection
-     * @return mixed
+     * @return \MongoDB\DeleteResult
      */
-    public function delete(){
+    public function delete(): \MongoDB\DeleteResult {
 
         $filter = array();
         $filter[ $this->_primaryKey ] = $this->__toString();
@@ -303,21 +304,21 @@ class Document extends Collection {
 
     /**
      * Reload object data
-     * @return object
+     * @return self
      */
-    public function reload(){
+    public function reload(): self {
         $this->findOne( $this->__toString() );
         return $this;
     }
 
     /**
      * Reset object data
-     * @return object
+     * @return self
      */
-    public function reset(){
+    public function reset(): self {
 
         $this->cleanData();
-        $this->_loaded = FALSE;
+        $this->_loaded = false;
 
         return $this;
     }
