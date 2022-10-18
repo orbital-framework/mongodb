@@ -24,7 +24,7 @@ Don't forget to append the following variables to your ``env.php`` file:
 ```php
 array(
     # ...
-    'MONGODB_URI' => 'mongodb://user:password@localhost:27017'
+    'MONGODB_URI' => 'mongodb://user:password@localhost:27017',
     'MONGODB_DATABASE' => 'my-database',
     # ...
 );
