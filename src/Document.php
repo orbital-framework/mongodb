@@ -50,7 +50,7 @@ class Document extends Collection {
      * @param array $options
      * @return void
      */
-    public function __construct(array $filter = null, array $options = array()): void {
+    public function __construct(array $filter = null, array $options = array()) {
 
         if( !$this->_unique ){
             $this->_unique = get_class($this);
@@ -106,7 +106,7 @@ class Document extends Collection {
      * @return void
      */
     public function __set(string $item, mixed $value): void {
-        return $this->setData($item, $value);
+        $this->setData($item, $value);
     }
 
     /**
@@ -124,16 +124,16 @@ class Document extends Collection {
      * @return void
      */
     public function __unset(string $item): void {
-        return $this->unsData($item);
+        $this->unsData($item);
     }
 
     /**
      * Magic method __call
      * @param string $name
      * @param mixed $arguments
-     * @return void
+     * @return mixed
      */
-    public function __call(string $name, mixed $arguments): void {
+    public function __call(string $name, mixed $arguments): mixed {
         $callable = array($this->getObject(), $name);
         return \call_user_func_array($callable, $arguments);
     }
