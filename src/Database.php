@@ -32,10 +32,9 @@ class Database extends Client {
      * Also clear current connection
      * @param string $databaseName
      * @param array $databaseOptions
-     * @param array $driverOptions
      * @return void
      */
-    public function setDatabase(string $name, string $options): void {
+    public function setDatabase(string $name, array $options): void {
 
         $this->_databaseName = $name;
         $this->_databaseOptions = $options;
