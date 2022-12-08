@@ -38,6 +38,13 @@ class Document extends Collection {
     protected $_primaryKey = 'uuid';
 
     /**
+     * Key normalization for object
+     * @access protected
+     * @var string
+     */
+    protected $_normalizeKey = Entity::NORMALIZE_SNAKE_CASE;
+
+    /**
      * Object data
      * @access protected
      * @var Entity
@@ -75,7 +82,7 @@ class Document extends Collection {
     public function getObject(): Entity {
 
         if( is_null($this->_object) ){
-            $this->_object = new Entity;
+            $this->_object = new Entity($this->_normalizeKey);
         }
 
         return $this->_object;
@@ -184,6 +191,7 @@ class Document extends Collection {
         $options['limit'] = 1;
 
         $this->reset();
+        $filter = $this->normalizeKeys($filter);
         $document = parent::findOne($filter, $options);
 
         if( $document ){
@@ -203,6 +211,7 @@ class Document extends Collection {
      */
     public function find(array $filter = array(), array $options = array()): \MongoDB\Driver\Cursor {
         $this->reset();
+        $filter = $this->normalizeKeys($filter);
         return parent::find($filter, $options);
     }
 
@@ -214,6 +223,7 @@ class Document extends Collection {
      */
     public function count(array $filter, array $options = array()): int {
         $this->reset();
+        $filter = $this->normalizeKeys($filter);
         return parent::count($filter, $options);
     }
 
@@ -225,6 +235,7 @@ class Document extends Collection {
      */
     public function aggregate(array $pipeline, array $options = array()): \Traversable {
         $this->reset();
+        $pipeline = $this->normalizeKeys($pipeline);
         return parent::aggregate($pipeline, $options);
     }
 
@@ -237,6 +248,8 @@ class Document extends Collection {
      */
     public function distinct(string $field, array $filter, array $options = array()): array {
         $this->reset();
+        $field = $this->normalizeKey($field);
+        $filter = $this->normalizeKeys($filter);
         return parent::distinct($field, $filter, $options);
     }
 
@@ -255,13 +268,9 @@ class Document extends Collection {
             OR !$this->_loaded ){
 
             $primaryKey = Uuid::generateShort();
-
-            $this->setData(
-                $this->_primaryKey, $primaryKey
-            );
+            $this->setData($this->_primaryKey, $primaryKey);
 
             $options = array();
-
             $result = parent::insertOne(
                 $this->toArray(),
                 $options
@@ -272,6 +281,8 @@ class Document extends Collection {
 
             $filter = array();
             $filter[ $this->_primaryKey ] = $this->__toString();
+            $filter = $this->normalizeKeys($filter);
+            
             $options = array();
 
             $result = parent::replaceOne(
@@ -296,6 +307,7 @@ class Document extends Collection {
 
         $filter = array();
         $filter[ $this->_primaryKey ] = $this->__toString();
+        $filter = $this->normalizeKeys($filter);
 
         $options = array();
 
