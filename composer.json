@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.1",
-        "mongodb/mongodb": "^1.12",
+        "mongodb/mongodb": "^1.15",
         "orbital-framework/framework": "^2.0",
         "orbital-framework/generator": "^2.0"
     },
